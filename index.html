@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cine Pantcookie</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+    <h1>Iniciar Sesión</h1>
+    <div class="login-options">
+        <button class="login-btn pantcookie-btn" id="pantcookieBtn">Pantcookie</button>
+        <button class="login-btn admin-btn" id="adminBtn">Administrador</button>
+    </div>
+    <div class="admin-login" id="adminLogin">
+        <div class="form-group">
+            <label for="adminUser">Email:</label>
+            <input type="email" id="adminUser" placeholder="Ingrese email administrador" required>
+        </div>
+        <div class="form-group">
+            <label for="adminPass">Contraseña:</label>
+            <input type="password" id="adminPass" placeholder="Ingrese contraseña" required>
+        </div>
+        <button class="primary-btn" id="loginAdminBtn">Ingresar</button>
+        <div class="login-links">
+            <a href="#" id="registerLink">Registrar nuevo administrador</a>
+            <a href="#" id="forgotPasswordLink">¿Olvidaste tu contraseña?</a>
+        </div>
+        <div class="login-error" id="loginError"></div>
+    </div>
+    <div class="admin-register" id="adminRegister" style="display:none;">
+        <h2>Registro de Administrador</h2>
+        <div class="form-group">
+            <label for="registerEmail">Email:</label>
+            <input type="email" id="registerEmail" placeholder="Ingrese email" required>
+        </div>
+        <div class="form-group">
+            <label for="registerPassword">Contraseña:</label>
+            <input type="password" id="registerPassword" placeholder="Cree una contraseña" required>
+        </div>
+        <div class="form-group">
+            <label for="registerConfirm">Confirmar Contraseña:</label>
+            <input type="password" id="registerConfirm" placeholder="Repita la contraseña" required>
+        </div>
+        <button class="primary-btn" id="registerBtn">Registrar</button>
+        <button class="secondary-btn" id="backToLoginBtn">Volver a Login</button>
+        <div class="register-error" id="registerError"></div>
+    </div>
+</div>
+
+    <div class="container" id="appContainer">
+        <div class="app-header">
+            <div class="user-info" id="userInfo"></div>
+            <button class="logout-btn" id="logoutBtn">Cerrar Sesión</button>
+        </div>
+        
+        <h1>Lista de Películas</h1>
+        
+        <div class="search-filter">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar por película o usuario">
+                <button class="primary-btn" id="searchBtn">Buscar</button>
+            </div>
+            <div class="filter-box">
+                <label for="filterSelect">Filtrar por:</label>
+                <select id="filterSelect" class="filter-select">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="date_asc">Fecha (Más reciente)</option>
+                    <option value="date_desc">Fecha (Más antigua)</option>
+                    <option value="watched">Vistas</option>
+                    <option value="not_watched">No vistas</option>
+                    <option value="movie_asc">Película (A-Z)</option>
+                    <option value="movie_desc">Película (Z-A)</option>
+                    <option value="user_asc">Usuario (A-Z)</option>
+                    <option value="user_desc">Usuario (Z-A)</option>
+                </select>
+            </div>
+        </div>
+        
+        <form id="movieForm">
+            <div class="form-group">
+                <label for="movieName">Nombre de la Película:</label>
+                <input type="text" id="movieName" required>
+                <div id="movieNameError" class="error-message">¡Por favor, ingrese el nombre de la película que desea recomendar!</div>
+            </div>
+            <div class="form-group">
+                <label for="userName">Recomendado por:</label>
+                <input type="text" id="userName" required>
+                <div id="userNameError" class="error-message">¡Por favor, ingrese su nombre de usuario!</div>
+            </div>
+            <div class="form-group">
+                <label for="watched">¿Visto?</label>
+                <select id="watched" required>
+                    <option value="true">Sí</option>
+                    <option value="false" selected>No</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="primary-btn" id="addMovieBtn">Agregar Película</button>
+                <button type="button" class="primary-btn" id="updateBtn" style="display:none;">Actualizar</button>
+                <button type="button" class="primary-btn" id="cancelBtn" style="display:none;">Cancelar</button>
+            </div>
+        </form>
+        
+        <div class="table-container">
+            <table id="moviesTable">
+                <thead>
+                    <tr>
+                        <th>Fecha y Hora</th>
+                        <th>Película</th>
+                        <th>Usuario</th>
+                        <th>Vista</th>
+                        <th id="actionsHeader">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="moviesList">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="loader-container" id="loaderContainer" style="display: none;">
+    <div class="loader"></div>
+    <div class="loader-text">Cargando lista de películas...</div>
+</div>
+
+        <div id="accessDeniedModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3>Acceso restringido</h3>
+        <p id="accessDeniedMessage">Acceso denegado: No tienes permisos de administrador</p>
+        <button id="understandBtn" class="primary-btn">Entendido</button>
+    </div>
+</div>
+    </div>
+
+    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
