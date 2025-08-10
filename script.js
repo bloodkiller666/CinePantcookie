@@ -3,8 +3,7 @@ import {
   getDatabase, 
   ref, 
   push, 
-  update, 
-  remove, 
+  update,
   onValue,
   set,
   get 
@@ -15,8 +14,6 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js";
 
 // Configuración de Firebase
@@ -54,10 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('adminBtn').addEventListener('click', showAdminLogin);
   document.getElementById('loginAdminBtn').addEventListener('click', loginAsAdmin);
   document.getElementById('logoutBtn').addEventListener('click', logout);
-  document.getElementById('registerLink').addEventListener('click', showRegisterForm);
-    document.getElementById('forgotPasswordLink').addEventListener('click', sendPasswordReset);
-    document.getElementById('registerBtn').addEventListener('click', registerAdmin);
-    document.getElementById('backToLoginBtn').addEventListener('click', showLoginForm);
   
   // Búsqueda y filtrado
   document.getElementById('searchBtn').addEventListener('click', searchMovies);
@@ -74,13 +67,6 @@ function showAdminLogin() {
     adminLogin.style.display = 'block';
 }
 
-// Función para mostrar el formulario de registro
-function showRegisterForm(e) {
-    e.preventDefault();
-    document.getElementById('adminLogin').style.display = 'none';
-    document.getElementById('adminRegister').style.display = 'block';
-}
-
 // Función para volver al login
 function showLoginForm() {
     document.getElementById('adminRegister').style.display = 'none';
@@ -88,63 +74,6 @@ function showLoginForm() {
     document.getElementById('registerError').style.display = 'none';
 }
 
-// Función para registrar nuevo administrador
-async function registerAdmin() {
-    const emailInput = document.getElementById('registerEmail');
-    const passwordInput = document.getElementById('registerPassword');
-    const confirmInput = document.getElementById('registerConfirm');
-    const errorElement = document.getElementById('registerError');
-    
-    // Resetear errores
-    errorElement.style.display = 'none';
-    
-    // Validación mejorada del email
-    const email = emailInput.value.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-        errorElement.textContent = "Por favor ingrese un email válido (ejemplo: admin@dominio.com)";
-        errorElement.style.display = 'block';
-        emailInput.focus();
-        return;
-    }
-
-    // Validación de contraseña
-    const password = passwordInput.value;
-    if (password.length < 6) {
-        errorElement.textContent = "La contraseña debe tener al menos 6 caracteres";
-        errorElement.style.display = 'block';
-        passwordInput.focus();
-        return;
-    }
-
-    if (password !== confirmInput.value) {
-        errorElement.textContent = "Las contraseñas no coinciden";
-        errorElement.style.display = 'block';
-        confirmInput.focus();
-        return;
-    }
-
-    try {
-        // 1. Registrar usuario en Firebase Auth
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        
-        // 2. Guardar datos adicionales en Realtime Database
-        await set(ref(db, `admins/${userCredential.user.uid}`), {
-            email: email,
-            createdAt: new Date().toISOString(),
-            isAdmin: true,
-            lastLogin: null
-        });
-
-        // 3. Mostrar éxito
-        alert(`¡Registro exitoso! Bienvenido ${email}`);
-        showLoginForm();
-        document.getElementById('adminUser').value = email;
-        
-    } catch (error) {
-        console.error("Error completo:", error);
-        handleAuthError(error, errorElement);
-    }
-}
 
 // Función para manejar errores
 function handleAuthError(error, errorElement) {
@@ -163,31 +92,6 @@ function handleAuthError(error, errorElement) {
 
     errorElement.textContent = messages[errorCode] || `Error inesperado: ${errorCode}`;
     errorElement.style.display = 'block';
-}
-
-// Función para recuperación de contraseña
-async function sendPasswordReset(e) {
-    e.preventDefault();
-    const email = document.getElementById('adminUser').value.trim();
-    const errorElement = document.getElementById('loginError');
-
-    if (!email) {
-        errorElement.textContent = "Por favor ingrese su email para recuperar la contraseña";
-        errorElement.style.display = 'block';
-        return;
-    }
-
-    try {
-        await sendPasswordResetEmail(auth, email);
-        errorElement.textContent = `Se ha enviado un enlace de recuperación a ${email}`;
-        errorElement.style.display = 'block';
-        errorElement.style.color = 'green';
-    } catch (error) {
-        console.error("Error al enviar email de recuperación:", error);
-        errorElement.textContent = getAuthErrorMessage(error.code);
-        errorElement.style.display = 'block';
-        errorElement.style.color = '#dc3545';
-    }
 }
 
 // Función para traducir errores de autenticación
@@ -226,24 +130,12 @@ async function loginAsAdmin() {
 
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        
-        // Verificar si es administrador (opcional)
-        const userRef = ref(db, 'admins/' + userCredential.user.uid);
-        onValue(userRef, (snapshot) => {
-            if (snapshot.exists() && snapshot.val().isAdmin) {
-                currentUser = { type: 'admin', uid: userCredential.user.uid };
-                updateUIAfterLogin();
-            } else {
-                hideLoader();
-                signOut(auth);
-                errorElement.textContent = "No tiene permisos de administrador";
-                errorElement.style.display = 'block';
-            }
-        });
+        currentUser = { type: 'admin', uid: userCredential.user.uid };
+        updateUIAfterLogin();
     } catch (error) {
         hideLoader();
         console.error("Error en login admin:", error);
-        errorElement.textContent = getAuthErrorMessage(error.code);
+        errorElement.textContent = "Email o contraseña incorrectos";
         errorElement.style.display = 'block';
     }
 }
