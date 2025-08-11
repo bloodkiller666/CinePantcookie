@@ -281,32 +281,47 @@ function addMovie() {
     .then(() => {
         hideLoader();
         document.getElementById('movieForm').reset();
+        showNotification('Película agregada correctamente');
     })
     .catch((error) => {
         hideLoader();
         addEventListenersToButtons();
-        console.error("Error al agregar película:", error);
+        showNotification('Error al agregar película', true);
         alert("Error al agregar película: " + error.message);
     });
+}
+
+function showNotification(message, isError = false) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${isError ? 'error' : ''}`;
+    notification.textContent = message;
+    notification.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
+    
+    document.body.appendChild(notification);
+    
+    // Eliminar la notificación después de 3 segundos
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
 }
 
 // Función para eliminar una película
 function deleteMovie(movieKey) {
     if (!currentUser || currentUser.type !== 'admin') {
         showAccessDenied();
-        return;}
-    
-    if (confirm('¿Estás seguro de que quieres eliminar esta película?')) {
+        return;
+    }  
+    if (confirm('¿Estás seguro de eliminar esta película?')) {
         showLoader();
         remove(ref(db, `movies/${movieKey}`))
             .then(() => {
                 hideLoader();
-                console.log("Película eliminada con éxito");
+                showNotification('Película eliminada correctamente');
             })
             .catch((error) => {
                 hideLoader();
+                showNotification('Error al eliminar la película', true);
                 console.error("Error al eliminar película:", error);
-                alert("Error al eliminar película: " + error.message);
             });
     }
 }
@@ -372,11 +387,12 @@ function updateMovie() {
     })
     .then(() => {
         hideLoader();
+        showNotification('Película actualizada correctamente');
         cancelEdit();
     })
     .catch((error) => {
         hideLoader();
-        console.error("Error al actualizar película:", error);
+        showNotification('Error al actualizar película', true);
         alert("Error al actualizar película: " + error.message);
     });
 }
@@ -551,18 +567,6 @@ function addEventListenersToButtons() {
         btn.addEventListener('click', (e) => {
             if (currentUser && currentUser.type === 'admin') {
                 editMovie(e.target.dataset.key);
-            } else {
-                showAccessDenied();
-            }
-        });
-    });
-
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            if (currentUser && currentUser.type === 'admin') {
-                if (confirm('¿Estás seguro de eliminar esta película?')) {
-                    deleteMovie(e.target.dataset.key);
-                }
             } else {
                 showAccessDenied();
             }
